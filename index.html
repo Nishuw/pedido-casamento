@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Pedido Especial</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: #fff;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .ring-container {
+            margin: 40px auto;
+            width: 200px;
+            height: 200px;
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .ring {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 20s linear infinite;
+        }
+        
+        /* Anel melhorado com base em um anel de casamento real */
+        .ring-band {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            margin: -50px 0 0 -50px;
+            border: 12px solid #ffd700; /* Ouro */
+            border-radius: 50%;
+            box-shadow: 
+                inset 0 0 10px rgba(0,0,0,0.3),
+                0 0 15px rgba(255,215,0,0.6);
+        }
+        
+        .diamond-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30%) translateZ(5px);
+            transform-style: preserve-3d;
+        }
+        
+        .diamond {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            transform-style: preserve-3d;
+        }
+        
+        .diamond-face {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            opacity: 0.9;
+        }
+        
+        .diamond-top {
+            top: -20px;
+            left: 0;
+            border-width: 0 17.5px 25px 17.5px;
+            border-color: transparent transparent rgba(255,255,255,0.9) transparent;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
+        }
+        
+        .diamond-bottom {
+            top: 5px;
+            left: 0;
+            border-width: 25px 17.5px 0 17.5px;
+            border-color: rgba(240,240,255,0.8) transparent transparent transparent;
+        }
+        
+        /* Brilhos */
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px white;
+            opacity: 0;
+            animation: sparkle 4s linear infinite;
+        }
+        
+        .sparkle:nth-child(1) {
+            width: 8px;
+            height: 8px;
+            top: -15px;
+            left: 15px;
+            animation-delay: 0s;
+        }
+        
+        .sparkle:nth-child(2) {
+            width: 6px;
+            height: 6px;
+            top: -10px;
+            left: 25px;
+            animation-delay: 1s;
+        }
+        
+        .sparkle:nth-child(3) {
+            width: 7px;
+            height: 7px;
+            top: -5px;
+            left: 5px;
+            animation-delay: 2s;
+        }
+        
+        /* Reflexos metálicos na banda */
+        .ring-band:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255,215,0,0.1), 
+                rgba(255,255,255,0.8), 
+                rgba(255,215,0,0.1));
+            border-radius: 50%;
+            transform: rotate(45deg);
+            filter: blur(5px);
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            transform: rotate(45deg);
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+        
+        .heart:before, .heart:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        
+        .heart:before {
+            top: -10px;
+            left: 0;
+        }
+        
+        .heart:after {
+            top: 0;
+            left: -10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #fff;
+            color: #ff758c;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .response-message {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 30px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotateY(0) rotateX(0);
+            }
+            100% {
+                transform: rotateY(360deg) rotateX(360deg);
+            }
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: rotate(45deg) translate(-10px, -10px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(45deg) translate(100vh, 100vw);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <h1>Meu Amor...</h1>
+        
+        <div class="ring-container">
+            <div class="ring">
+                <div class="ring-band"></div>
+                <div class="diamond-container">
+                    <div class="diamond">
+                        <div class="diamond-face diamond-top"></div>
+                        <div class="diamond-face diamond-bottom"></div>
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="proposal">
+            <p>Desde o primeiro dia em que nos conhecemos, soube que você era especial. A cada momento que passamos juntos, meu amor por você só cresce mais.</p>
+            
+            <p>Você me faz querer ser uma pessoa melhor a cada dia. E hoje, com todo o meu coração, eu quero fazer a pergunta mais importante da minha vida:</p>
+            
+            <p><strong>Você aceita se casar comigo?</strong></p>
+            
+            <div>
+                <button class="btn" id="yes-btn">SIM!</button>
+                <button class="btn" id="no-btn">Não</button>
+            </div>
+        </div>
+        
+        <div id="response" class="hidden">
+            <p class="response-message">Você me fez o homem mais feliz do mundo!</p>
+            <p>Mal posso esperar para começar nossa vida juntos.</p>
+            <p>Eu te amo infinitamente! ❤️</p>
+        </div>
+    </div>
+    
+    <script>
+        // Função para criar corações flutuantes
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                // Posição aleatória
+                const left = Math.random() * 100;
+                heart.style.left = left + 'vw';
+                
+                // Tamanho aleatório
+                const size = Math.random() * 20 + 10;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                // Cor aleatória em tons de vermelho/rosa
+                const red = Math.floor(Math.random() * 55) + 200;
+                const green = Math.floor(Math.random() * 50);
+                const blue = Math.floor(Math.random() * 50) + 50;
+                heart.style.background = `rgb(${red}, ${green}, ${blue})`;
+                
+                // Ajustar pseudo-elementos
+                heart.style.setProperty('--heart-color', `rgb(${red}, ${green}, ${blue})`);
+                
+                // Duração aleatória da animação
+                const duration = Math.random() * 20 + 10;
+                heart.style.animationDuration = duration + 's';
+                
+                // Atraso aleatório
+                const delay = Math.random() * 15;
+                heart.style.animationDelay = delay + 's';
+                
+                heartsContainer.appendChild(heart);
+            }
+        }
+        
+        // Manipulador de eventos para botões
+        document.getElementById('yes-btn').addEventListener('click', function() {
+            document.getElementById('proposal').classList.add('hidden');
+            document.getElementById('response').classList.remove('hidden');
+            createMoreHearts();
+        });
+        
+        // Função para criar mais corações quando clicar em "Sim"
+        function createMoreHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = 50;
+            
+            for (let i = 0; i < heartCount; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    
+                    // Posição aleatória
+                    const left = Math.random() * 100;
+                    heart.style.left = left + 'vw';
+                    
+                    // Tamanho aleatório
+                    const size = Math.random() * 30 + 10;
+                    heart.style.width = size + 'px';
+                    heart.style.height = size + 'px';
+                    
+                    // Cor aleatória em tons de vermelho/rosa
+                    const red = Math.floor(Math.random() * 55) + 200;
+                    const green = Math.floor(Math.random() * 50);
+                    const blue = Math.floor(Math.random() * 50) + 50;
+                    heart.style.background = `rgb(${red}, ${green}, ${blue})`;
+                    
+                    // Duração aleatória da animação
+                    const duration = Math.random() * 10 + 5;
+                    heart.style.animationDuration = duration + 's';
+                    
+                    heartsContainer.appendChild(heart);
+                }, i * 100);
+            }
+        }
+        
+        // Fazer o botão "Não" fugir do cursor
+        document.getElementById('no-btn').addEventListener('mouseover', function(e) {
+            const button = e.target;
+            const container = document.querySelector('.container');
+            
+            // Gerar posição aleatória dentro do container
+            const newX = Math.random() * (container.offsetWidth - button.offsetWidth);
+            const newY = Math.random() * (container.offsetHeight - button.offsetHeight);
+            
+            button.style.position = 'absolute';
+            button.style.left = newX + 'px';
+            button.style.top = newY + 'px';
+        });
+        
+        // Iniciar com alguns corações
+        createHearts();
+    </script>
+</body>
+</html>
